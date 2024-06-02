@@ -1,11 +1,15 @@
- #[derive(Queryable, Serializable)]
+use super::schema::books;
+use serde::{Deserialize, Serialize};
+use actix_web::web;
+
+#[derive(Queryable, Serialize)]
  pub struct Book{
     pub id: i32,
     pub name: String,
     pub author: String,
  }
 
- #[derive(Debug,Insertable, AsChangeset, Serializable,Deserialize, Clone)]
+ #[derive(Debug,Insertable, AsChangeset, Serialize, Deserialize, Clone)]
  #[table_name="books"]
  pub struct NewBook{
    pub name: String,
@@ -13,7 +17,7 @@
   }
 
 impl From<web::Json<NewBook>> for NewBook{
-    fn from(book: web::Json<NewBook>)-> Self{
+    fn from(book :web::Json<NewBook>)-> Self{
         NewBook{
             name: book.name.clone(),
             author: book.author.clone(),

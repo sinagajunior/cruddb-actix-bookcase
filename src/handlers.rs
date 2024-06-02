@@ -1,5 +1,4 @@
-use std::ffi::IntoStringError;
-use std::sync::BarrierWaitResult;
+
 use actix_web::{web, HttpResponse};
 use diesel::prelude::*;
 use log::{error, warn};
@@ -19,7 +18,7 @@ struct BookEndpointPath{
 
 
   async  fn get_books(pool: web::Data<DbPool>) -> Result<HttpResponse,UserError> {
-     let mut connection = ppol.get().map_err(|_| {
+     let mut connection = pool.get().map_err(|_| {
          error!("Failed to get DB connection from pool");
          UserError::InternalError
      })?;
@@ -53,7 +52,7 @@ struct BookEndpointPath{
       web::block(move|| books.filter(id.eq(query_id)).first::<Book>(&mut connection))
           .await
           .map_err(|_| UserError::InternalError)?
-          .map_err(|_| match e{
+          .map_err(|e| match e{
               diesel::result::Error::NotFound => {
                   error!("Book id: {} not found in DN ", &book_id.id);
                   UserError::NotFoundError
@@ -79,7 +78,7 @@ struct BookEndpointPath{
           .await
           .map_err(|_| UserError::InternalError)?
           .map_err(|e| match e{
-              diesel::result::Error::Notfound => {
+              diesel::result::Error::NotFound => {
                   error!("Book id: not found in DB");
                   UserError::NotFoundError
               }

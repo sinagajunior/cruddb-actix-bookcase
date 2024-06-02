@@ -1,4 +1,10 @@
 
+
+ use actix_web::http::StatusCode;
+ use actix_web::{error,HttpResponse};
+ use derive_more::Display;
+ use serde_json::json;
+
 #[derive(Display,Debug)]
 pub enum UserError {
     #[display(fmt="Invalid input parameter")]
@@ -14,7 +20,7 @@ pub enum UserError {
      }
      fn status_code(&self) -> StatusCode {
          match *self{
-             UserError::ValidationError => StatusCode::BADREQUEST,
+             UserError::ValidationError => StatusCode::BAD_REQUEST,
              UserError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
              UserError::NotFoundError => StatusCode::NOT_FOUND,
          }
